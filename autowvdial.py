@@ -60,6 +60,7 @@ def wait_for_modem(modem_devfile):
     while not timed_out(start):
         if os.path.exists(modem_devfile):
             logger.info("modem '%s' found", modem_devfile)
+            break
         time.sleep(0.05)
 
     logger.info("waiting for modem '%s' serial port to be ready", modem_devfile)
