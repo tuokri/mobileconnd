@@ -31,6 +31,8 @@ void terminate(int signo)
 
 int main()
 {
+    puts("starting mobileconnd");
+
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
     action.sa_handler = terminate;
@@ -39,18 +41,22 @@ int main()
 
     while(!DONE)
     {
-        int status = system("ping -c 1 -I ppp0 google.com");
+        int status = system("ping -c 1 -I ppp0 google.com > /dev/null");
         if(status != EXIT_SUCCESS)
         {
+            puts("ping failed");
+
             // Ping failed but we already have a child.
             // Did the dialer script hang or error?
             // Kill the child and spawn a new one.
             if(CHILD_PID != -1)
             {
+                puts("autowvdial already running, killing...");
                 kill(CHILD_PID, SIGTERM);
                 sleep(5); // Grace period.
                 kill(CHILD_PID, SIGKILL);
                 CHILD_PID = -1;
+                puts("autowvdial killed");
             }
 
             if((CHILD_PID = fork()) < 0)
@@ -60,16 +66,22 @@ int main()
             }
             else if(CHILD_PID == 0)
             {
+                puts("starting autowvdial")
                 execlp(DIALSCRIPT, DIALSCRIPT, MODEM, PIN, "-d",
                     DIALER, "-t", TIMEOUT, (char*)NULL);
                 perror("execlp error");
                 _exit(EXIT_FAILURE);
             }
         }
+        else
+        {
+            puts("ping succesful");
+        }
 
+        puts("sleeping for 5 minutes...");
         sleep(60 * 5);
     }
 
-    printf("Done. Exiting.");
+    printf("done, exiting");
     return 0;
 }
