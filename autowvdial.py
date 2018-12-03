@@ -52,6 +52,7 @@ logger.addHandler(SystemdHandler())
 
 def wait_for_modem(modem_devfile):
     """Wait until modem device file is found or timed out.
+    After device file is found, wait until serial port is usable.
     :param modem_devfile: Device file path of the modem.
     """
     logger.info("waiting for modem: %s", modem_devfile)
@@ -59,9 +60,17 @@ def wait_for_modem(modem_devfile):
     while not timed_out(start):
         if os.path.exists(modem_devfile):
             logger.info("modem '%s' found", modem_devfile)
-            return
         time.sleep(0.05)
-    logger.error("timed out waiting for modem: %s", modem_devfile)
+
+    logger.info("waiting for modem '%s' serial port to be ready", modem_devfile)
+    start = time.time()
+    while not timed_out(start):
+        try:
+            with serial.Serial(modem_devfile, timeout=TIMEOUT, write_timeout=TIMEOUT) as ser:
+                logger.info("modem '%s' serial port ready", modem_devfile)
+        except serial.SerialException:
+            pass
+        time.sleep(0.05)
 
 
 def enter_sim_pin(modem_devfile, pin):
@@ -93,7 +102,6 @@ def enter_sim_pin(modem_devfile, pin):
                         logger.error("received '%s' while entering SIM PIN", last_recv)
                         logger.error("message buffer: %s", buf)
                         return
-                time.sleep(0.05)
             logger.error("timed out entering SIM PIN")
     except serial.SerialException as se:
         logger.error("error entering SIM PIN: %s", se)
@@ -125,6 +133,8 @@ def timed_out(start, timeout=TIMEOUT):
         return False
     if start + timeout >= time.time():
         return False
+
+    logger.warning("timed out with timeout=%d", timeout)
     return True
 
 
