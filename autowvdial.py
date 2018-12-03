@@ -68,6 +68,7 @@ def wait_for_modem(modem_devfile):
         try:
             with serial.Serial(modem_devfile, timeout=TIMEOUT, write_timeout=TIMEOUT) as ser:
                 logger.info("modem '%s' serial port ready", modem_devfile)
+                return
         except serial.SerialException:
             pass
         time.sleep(0.05)
