@@ -66,7 +66,7 @@ int main()
             }
             else if(CHILD_PID == 0)
             {
-                puts("starting autowvdial")
+                puts("starting autowvdial");
                 execlp(DIALSCRIPT, DIALSCRIPT, MODEM, PIN, "-d",
                     DIALER, "-t", TIMEOUT, (char*)NULL);
                 perror("execlp error");
