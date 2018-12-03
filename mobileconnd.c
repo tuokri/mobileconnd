@@ -17,7 +17,7 @@ pid_t CHILD_PID = -1;
 const char* const DIALSCRIPT = "autowvdial";
 const char* const MODEM      = "/dev/gsmmodem";
 const char* const DIALER     = "LTE";
-const char* const PIN        = "20042004";
+const char* const PIN        = "00000000";
 const char* const TIMEOUT    = "60";
 
 void terminate(int signo)
