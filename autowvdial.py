@@ -96,7 +96,7 @@ def enter_sim_pin(modem_devfile, pin):
                 time.sleep(0.05)
             logger.error("timed out entering SIM PIN")
     except serial.SerialException as se:
-        logger.error("error entering SIM PIN: %s", se.strerror)
+        logger.error("error entering SIM PIN: %s", se)
     except Exception as e:
         logger.error("error entering SIM PIN: %s", e)
 
