@@ -83,7 +83,7 @@ def enter_sim_pin(modem_devfile, pin):
     logger.info("entering SIM PIN")
     try:
         with serial.Serial(modem_devfile, BAUDRATE, timeout=TIMEOUT, write_timeout=TIMEOUT) as ser:
-            logger.info("opening serial port: %s", modem_devfile)
+            logger.info("serial port opened: %s", modem_devfile)
             ser.reset_input_buffer()
             ser.reset_output_buffer()
             ser.write("AT+CPIN={}\r\n".format(pin).encode())
