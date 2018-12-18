@@ -29,9 +29,10 @@ void terminate(int signo)
     }
 }
 
-int main()
+int main(int argc, char* argv[])
 {
-    puts("starting mobileconnd\n");
+    setbuf(stdout, NULL);
+    printf("starting mobileconnd\n");
 
     struct sigaction action;
     memset(&action, 0, sizeof(struct sigaction));
@@ -44,19 +45,19 @@ int main()
         int status = system("ping -c 1 -I ppp0 google.com > /dev/null");
         if(status != EXIT_SUCCESS)
         {
-            puts("ping failed\n");
+            printf("ping failed\n");
 
             // Ping failed but we already have a child.
             // Did the dialer script hang or error?
             // Kill the child and spawn a new one.
             if(CHILD_PID != -1)
             {
-                puts("autowvdial already running, killing...\n");
+                printf("autowvdial already running, killing...\n");
                 kill(CHILD_PID, SIGTERM);
                 sleep(5); // Grace period.
                 kill(CHILD_PID, SIGKILL);
                 CHILD_PID = -1;
-                puts("autowvdial killed\n");
+                printf("autowvdial killed\n");
             }
 
             if((CHILD_PID = fork()) < 0)
@@ -66,7 +67,7 @@ int main()
             }
             else if(CHILD_PID == 0)
             {
-                puts("starting autowvdial\n");
+                printf("starting autowvdial\n");
                 execlp(DIALSCRIPT, DIALSCRIPT, MODEM, PIN, "-d",
                     DIALER, "-t", TIMEOUT, (char*)NULL);
                 perror("execlp error\n");
@@ -75,10 +76,10 @@ int main()
         }
         else
         {
-            puts("ping succesful\n");
+            printf("ping succesful\n");
         }
 
-        puts("sleeping for 5 minutes...\n");
+        printf("sleeping for 5 minutes...\n");
         sleep(60 * 5);
     }
 
